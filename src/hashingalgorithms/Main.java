@@ -1,4 +1,4 @@
-package com.company;
+package hashingalgorithms;
 
 public class Main {
 
