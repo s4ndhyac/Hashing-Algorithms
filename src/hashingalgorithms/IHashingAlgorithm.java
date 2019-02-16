@@ -10,4 +10,6 @@ public interface IHashingAlgorithm {
 
     int delete(Integer key);
 
+    double getLoadFactor();
+
 }
