@@ -5,10 +5,12 @@ import java.util.LinkedList;
 
 public class ChainedHashing implements IHashingAlgorithm {
     int capacity;
+    int size;
     ArrayList<LinkedList<Entry>> list;
 
     ChainedHashing(int capacity) {
         this.capacity = capacity;
+        this.size = 0;
         list = new ArrayList<>(capacity);
         for(int i = 0; i < capacity; i++) {
             list.add(null);
@@ -46,6 +48,7 @@ public class ChainedHashing implements IHashingAlgorithm {
                 list.get(index).add(new Entry(key, value));
             }
         }
+        size++;
         return count;
     }
 
@@ -82,10 +85,19 @@ public class ChainedHashing implements IHashingAlgorithm {
             }
             if(toDelete != null) {
                 list.get(index).remove(toDelete);
+                size--;
                 count++;
             }
         }
 
         return count;
     }
+
+
+    @Override
+    public double getLoadFactor()
+    {
+        return (double)size / (double)capacity;
+    }
+
 }
