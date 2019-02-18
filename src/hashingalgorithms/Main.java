@@ -10,86 +10,88 @@ public class Main {
 
     public static void main(String[] args) {
 
-        int numSteps = Integer.parseInt("100");
-        int stepSize = Integer.parseInt("50");
-        int avgTime = 100;
+        int dataPoints = Integer.parseInt(args[0]);
+        int intervalSize = Integer.parseInt(args[1]);
+        int numTrials = Integer.parseInt(args[2]);
+        int arraySize = dataPoints * intervalSize;
 
-        double start, end, avgSet = 0, avgDelete = 0, avgSearch = 0;
+        double start, end, setAvg = 0, deleteAvg = 0, searchAvg = 0;
         double loadFactor = 0;
-        double[] loadFactors = new double[numSteps];
-        double[] setCosts = new double[numSteps];
-        double[] deleteCosts = new double[numSteps];
-        double[] searchCosts = new double[numSteps];
+        double[] loadFactors = new double[dataPoints];
+        double[] setRT = new double[dataPoints];
+        double[] deleteRT = new double[dataPoints];
+        double[] searchRT = new double[dataPoints];
 
         Random random = new Random();
         IHashingAlgorithm h;
 
-        for (int i = 1; i < numSteps; i++) {
-            avgSet = 0;
-            avgDelete = 0;
-            avgSearch = 0;
+        for (int i = 1; i < dataPoints; i++) {
+            setAvg = 0;
+            deleteAvg = 0;
+            searchAvg = 0;
             loadFactor = 0;
-            for (int j = 0; j < avgTime; j++) {
-                switch ("4")
+            int range = i * intervalSize;
+            for (int j = 0; j < numTrials; j++) {
+                switch (args[3])
                 {
                     case "1":
-                        h = new ChainedHashing(100000);
+                        h = new ChainedHashing(arraySize);
                         break;
                     case "2":
-                        h = new LinearProbing(100000);
+                        h = new LinearProbing(arraySize);
                         break;
                     case "3":
-                        h = new QuadraticProbing(100000);
+                        h = new QuadraticProbing(arraySize);
                         break;
                     case "4":
-                        h = new CuckooHashing(5000);
+                        h = new CuckooHashing(arraySize);
                         break;
                     default:
                         throw new IllegalArgumentException("Illegal function");
                 }
 
                 // generate random keys
-                List<Integer> list = new ArrayList<>(i*stepSize);
-                for (int k = 0; k < i*stepSize; k++) {
+                List<Integer> list = new ArrayList<>(i*intervalSize);
+                for (int k = 0; k < range; k++) {
                     list.add(random.nextInt(1000000));
                 }
 
                 start = System.currentTimeMillis();
-                for (int k = 0; k < i*stepSize; k++) {
+                for (int k = 0; k < range; k++) {
                     h.set(list.get(k), list.get(k));
                 }
                 end = System.currentTimeMillis();
-                avgSet += (end - start);
+                setAvg += (end - start);
                 loadFactor += h.getLoadFactor();
 
                 Collections.shuffle(list);
                 start = System.currentTimeMillis();
-                for (int k = 0; k < stepSize && k < i*stepSize; k++) {
+                for (int k = 0; k < range; k++) {
                     h.search(list.get(k));
                 }
                 end = System.currentTimeMillis();
-                avgSearch += (end - start);
+                searchAvg += (end - start);
 
                 Collections.shuffle(list);
                 start = System.currentTimeMillis();
-                for (int k = 0; k < stepSize && k < i*stepSize; k++) {
+                for (int k = 0; k < range; k++) {
                     h.delete(list.get(k));
                 }
                 end = System.currentTimeMillis();
-                avgDelete += (end - start);
+                deleteAvg += (end - start);
             }
 
-            loadFactors[i] = loadFactor/avgTime;
+            loadFactors[i] = loadFactor/numTrials;
             System.out.println("i = " + i + ", loadFactor: " + loadFactors[i]);
 
-            setCosts[i] = avgSet / avgTime;
-            System.out.println("i = " + i + ", set: " + setCosts[i]);
+            setRT[i] = setAvg / numTrials;
+            System.out.println("i = " + i + ", set: " + setRT[i]);
 
-            deleteCosts[i] = avgDelete / avgTime;
-            System.out.println("i = " + i + ", delete: " + deleteCosts[i]);
+            deleteRT[i] = deleteAvg / numTrials;
+            System.out.println("i = " + i + ", delete: " + deleteRT[i]);
 
-            searchCosts[i] = avgSearch / avgTime;
-            System.out.println("i = " + i + ", search: " + searchCosts[i]);
+            searchRT[i] = searchAvg / numTrials;
+            System.out.println("i = " + i + ", search: " + searchRT[i]);
 
         }
 
