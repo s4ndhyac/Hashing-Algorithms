@@ -6,14 +6,14 @@ import java.util.LinkedList;
 public class ChainedHashing implements IHashingAlgorithm {
     int capacity;
     int size;
-    ArrayList<LinkedList<Entry>> list;
+    ArrayList<LinkedList<Entry>> bucket;
 
     ChainedHashing(int capacity) {
         this.capacity = capacity;
         this.size = 0;
-        list = new ArrayList<>(capacity);
+        bucket = new ArrayList<>(capacity);
         for(int i = 0; i < capacity; i++) {
-            list.add(null);
+            bucket.add(null);
         }
     }
 
@@ -27,13 +27,13 @@ public class ChainedHashing implements IHashingAlgorithm {
     public int set(Integer key, Integer value) {
         int index = hash(key);
         int count = 0;
-        if(list.get(index) == null) {
+        if(bucket.get(index) == null) {
             LinkedList<Entry> chain = new LinkedList<>();
             chain.add(new Entry(key, value));
-            list.set(index, chain);
+            bucket.set(index, chain);
             count++;
         } else {
-            LinkedList<Entry> chain = list.get(index);
+            LinkedList<Entry> chain = bucket.get(index);
             boolean alreadyExist = false;
             for(Entry entry : chain) {
                 count++;
@@ -45,7 +45,7 @@ public class ChainedHashing implements IHashingAlgorithm {
             }
             if(!alreadyExist) {
                 count++;
-                list.get(index).add(new Entry(key, value));
+                bucket.get(index).add(new Entry(key, value));
             }
         }
         size++;
@@ -58,8 +58,8 @@ public class ChainedHashing implements IHashingAlgorithm {
         int index = hash(key);
         int result = -1;
         int count = 0;
-        if(list.get(index) != null) {
-            for(Entry temp : list.get(index)) {
+        if(bucket.get(index) != null) {
+            for(Entry temp : bucket.get(index)) {
                 count++;
                 if(temp.key.equals(key)) {
                     result = temp.value;
@@ -74,9 +74,9 @@ public class ChainedHashing implements IHashingAlgorithm {
     public int delete(Integer key) {
         int index = hash(key);
         int count = 0;
-        if(list.get(index) != null) {
+        if(bucket.get(index) != null) {
             Entry toDelete = null;
-            for(Entry temp : list.get(index)) {
+            for(Entry temp : bucket.get(index)) {
                 count++;
                 if(temp.key.equals(key)) {
                     toDelete = temp;
@@ -84,7 +84,7 @@ public class ChainedHashing implements IHashingAlgorithm {
                 }
             }
             if(toDelete != null) {
-                list.get(index).remove(toDelete);
+                bucket.get(index).remove(toDelete);
                 size--;
                 count++;
             }

@@ -2,15 +2,15 @@ package hashingalgorithms;
 
 public class CuckooHashing implements IHashingAlgorithm {
 
-    private Entry[] table1;
-    private Entry[] table2;
+    private Entry[] hashtable1;
+    private Entry[] hashtable2;
     private int a = 37452, b = 43807;
     int size;
     int capacity;
 
     public CuckooHashing() {
-        table1 = new Entry[16];
-        table2 = new Entry[16];
+        hashtable1 = new Entry[16];
+        hashtable2 = new Entry[16];
         capacity = 16;
         size = 0;
     }
@@ -19,34 +19,34 @@ public class CuckooHashing implements IHashingAlgorithm {
         if (initialCapacity < 1)
             throw new IllegalArgumentException("Illegal initial capacity: " +
                     initialCapacity);
-        table1 = new Entry[initialCapacity];
-        table2 = new Entry[initialCapacity];
+        hashtable1 = new Entry[initialCapacity];
+        hashtable2 = new Entry[initialCapacity];
         capacity = initialCapacity;
         size = 0;
     }
 
     @Override
     public int[] search(Integer key) {
-        int index = indexFor(hash1(key), capacity);
-        if(table1[index].key == key)
-            return new int[]{table1[index].value, 1};
+        int index = indexFor(hash0(key), capacity);
+        if(hashtable1[index].key == key)
+            return new int[]{hashtable1[index].value, 1};
 
-        index = indexFor(hash2(key), capacity);
-        if(table2[index].key == key)
-            return new int[] {table2[index].value, 1};
+        index = indexFor(hash1(key), capacity);
+        if(hashtable2[index].key == key)
+            return new int[] {hashtable2[index].value, 1};
 
         return new int[] {-1, 1};
     }
 
     @Override
     public int set(Integer key, Integer value) {
-        if(table1[indexFor(hash1(key), capacity)] != null && table1[indexFor(hash1(key), capacity)].key == key) {
-            table1[indexFor(hash1(key), capacity)].value = value;
+        if(hashtable1[indexFor(hash0(key), capacity)] != null && hashtable1[indexFor(hash0(key), capacity)].key == key) {
+            hashtable1[indexFor(hash0(key), capacity)].value = value;
             return 1;
         }
 
-        if(table2[indexFor(hash2(key), capacity)] != null && table2[indexFor(hash2(key), capacity)].key == key) {
-            table2[indexFor(hash2(key), capacity)].value = value;
+        if(hashtable2[indexFor(hash1(key), capacity)] != null && hashtable2[indexFor(hash1(key), capacity)].key == key) {
+            hashtable2[indexFor(hash1(key), capacity)].value = value;
             return 1;
         }
 
@@ -54,23 +54,23 @@ public class CuckooHashing implements IHashingAlgorithm {
         Entry entry = new Entry(key, value);
         Entry tmp;
 
-        index = indexFor(hash1(entry.key), capacity);
-        tmp = table1[index];
-        table1[index] = entry;
+        index = indexFor(hash0(entry.key), capacity);
+        tmp = hashtable1[index];
+        hashtable1[index] = entry;
         entry = tmp;
         t = 1;
         counter++;
 
         while(entry != null && counter <= (size+1)) {
             if(t == 0) {
-                index = indexFor(hash1(entry.key), capacity);
-                tmp = table1[index];
-                table1[index] = entry;
+                index = indexFor(hash0(entry.key), capacity);
+                tmp = hashtable1[index];
+                hashtable1[index] = entry;
                 entry = tmp;
             } else {
-                index = indexFor(hash2(entry.key), capacity);
-                tmp = table2[index];
-                table2[index] = entry;
+                index = indexFor(hash1(entry.key), capacity);
+                tmp = hashtable2[index];
+                hashtable2[index] = entry;
                 entry = tmp;
             }
             t = 1 - t;
@@ -87,13 +87,13 @@ public class CuckooHashing implements IHashingAlgorithm {
 
     @Override
     public int delete(Integer key) {
-        int index1 = indexFor(hash1(key), capacity);
-        int index2 = indexFor(hash2(key), capacity);
-        if(table1[index1] != null && table1[index1].key == key) {
-            table1[index1] = null;
+        int index1 = indexFor(hash0(key), capacity);
+        int index2 = indexFor(hash1(key), capacity);
+        if(hashtable1[index1] != null && hashtable1[index1].key == key) {
+            hashtable1[index1] = null;
             size--;
-        } else if(table2[index2] != null && table2[index2].key == key) {
-            table2[index2] = null;
+        } else if(hashtable2[index2] != null && hashtable2[index2].key == key) {
+            hashtable2[index2] = null;
             size--;
         } else
             return -1;
@@ -101,22 +101,22 @@ public class CuckooHashing implements IHashingAlgorithm {
     }
 
     private void rehash() {
-        Entry[] oldTable1 = table1;
-        Entry[] oldTable2 = table2;
+        Entry[] oldHashtable1 = hashtable1;
+        Entry[] oldHashtable2 = hashtable2;
 
         if(size*2 >= capacity) {
             capacity *= 2;
         }
         size = 0;
-        table1 = new Entry[capacity];
-        table2 = new Entry[capacity];
+        hashtable1 = new Entry[capacity];
+        hashtable2 = new Entry[capacity];
 
-        for(Entry e : oldTable1){
+        for(Entry e : oldHashtable1){
             if(e == null)
                 continue;
             set(e.key, e.value);
         }
-        for(Entry e : oldTable2){
+        for(Entry e : oldHashtable2){
             if(e == null)
                 continue;
             set(e.key, e.value);
@@ -128,7 +128,7 @@ public class CuckooHashing implements IHashingAlgorithm {
         return (double)size / (double)capacity;
     }
 
-    int hash1(int h) {
+    int hash0(Integer h) {
         int result = 2135423121;
         String s = h + "";
         for (int i = 0; i < s.length(); i++) {
@@ -137,7 +137,7 @@ public class CuckooHashing implements IHashingAlgorithm {
         return result;
     }
 
-    int hash2(int h) {
+    int hash1(Integer h) {
         int result = 0, c = a;
         String s = h + "";
         for (int i = 0; i < s.length(); i++) {
@@ -153,8 +153,8 @@ public class CuckooHashing implements IHashingAlgorithm {
         throw new IllegalArgumentException("Not Implemented");
     }
 
-    static int indexFor(int h, int length) {
-        return Math.abs(h) % length;
+    static int indexFor(Integer hashValue, Integer capacity) {
+        return Math.abs(hashValue) % capacity;
     }
 
 

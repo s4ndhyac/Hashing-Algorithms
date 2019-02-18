@@ -2,17 +2,17 @@ package hashingalgorithms;
 
 import java.util.ArrayList;
 
-public class Quadratic implements IHashingAlgorithm{
+public class QuadraticProbing implements IHashingAlgorithm{
 
-    private ArrayList<Entry> list;
+    private ArrayList<Entry> bucket;
     private int capacity;
     private int size;
 
 
-    public Quadratic(int capacity) {
-        list = new ArrayList<>(capacity);
+    public QuadraticProbing(int capacity) {
+        bucket = new ArrayList<>(capacity);
         for(int i = 0; i < capacity; i++) {
-            list.add(null);
+            bucket.add(null);
         }
         this.capacity = capacity;
         this.size = 0;
@@ -30,12 +30,12 @@ public class Quadratic implements IHashingAlgorithm{
         int count = 0;
         int hashVal = hash(key);
         int index = (hashVal + count * count) % capacity;
-        while(count < capacity && list.get(index) != null && list.get(index).key != null && !list.get(index).key.equals(key)) {
+        while(count < capacity && bucket.get(index) != null && bucket.get(index).key != null && !bucket.get(index).key.equals(key)) {
             index = (hashVal + count * count) % capacity;
             count++;
         }
-        if(count < capacity|| list.get(index).key.equals(key)) {
-            list.set(index, new Entry(key, value));
+        if(count < capacity|| bucket.get(index).key.equals(key)) {
+            bucket.set(index, new Entry(key, value));
             count++;
             size++;
         }
@@ -48,13 +48,13 @@ public class Quadratic implements IHashingAlgorithm{
         int count = 0;
         int hashVal = hash(key);
         int index = (hashVal + count * count) % capacity;
-        while(count < capacity && list.get(index) != null && (list.get(index).key == null || !list.get(index).key.equals(key))) {
+        while(count < capacity && bucket.get(index) != null && (bucket.get(index).key == null || !bucket.get(index).key.equals(key))) {
             index = (hashVal + count * count) % capacity;
             count++;
         }
         int result = -1;
-        if(count < capacity && list.get(index) != null) {
-            result = list.get(index).value;
+        if(count < capacity && bucket.get(index) != null) {
+            result = bucket.get(index).value;
         }
         return new int[]{result, count};
     }
@@ -65,13 +65,13 @@ public class Quadratic implements IHashingAlgorithm{
         int count = 0;
         int hashVal = hash(key);
         int index = (hashVal + count * count) % capacity;
-        while(count < capacity && list.get(index) != null && (list.get(index).key == null || !list.get(index).key.equals(key))) {
+        while(count < capacity && bucket.get(index) != null && (bucket.get(index).key == null || !bucket.get(index).key.equals(key))) {
             index = (hashVal + count * count) % capacity;
             count++;
         }
 
-        if(count < capacity && list.get(index) != null) {
-            list.get(index).key = null;
+        if(count < capacity && bucket.get(index) != null) {
+            bucket.get(index).key = null;
             count++;
             size--;
         }

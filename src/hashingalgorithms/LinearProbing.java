@@ -3,15 +3,15 @@ package hashingalgorithms;
 import java.util.ArrayList;
 
 public class LinearProbing implements IHashingAlgorithm {
-    private ArrayList<Entry> list;
+    private ArrayList<Entry> bucket;
     private int capacity;
     private int size;
 
 
     public LinearProbing(int capacity) {
-        list = new ArrayList<>(capacity);
+        bucket = new ArrayList<>(capacity);
         for(int i = 0; i < capacity; i++) {
-            list.add(null);
+            bucket.add(null);
         }
         this.capacity = capacity;
         this.size = 0;
@@ -27,12 +27,12 @@ public class LinearProbing implements IHashingAlgorithm {
     public int set(Integer key, Integer value) {
         int index = hash(key);
         int count = 0;
-        while(count != capacity && list.get(index) != null && list.get(index).key != null && !list.get(index).key.equals(key)) {
+        while(count != capacity && bucket.get(index) != null && bucket.get(index).key != null && !bucket.get(index).key.equals(key)) {
             index = (index + 1) % capacity;
             count++;
         }
-        if(count != capacity || list.get(index).key.equals(key)) {
-            list.set(index, new Entry(key, value));
+        if(count != capacity || bucket.get(index).key.equals(key)) {
+            bucket.set(index, new Entry(key, value));
             size++;
             count++;
         }
@@ -43,13 +43,13 @@ public class LinearProbing implements IHashingAlgorithm {
     public int[] search(Integer key) {
         int index = hash(key);
         int count = 0;
-        while(count != capacity && list.get(index) != null && !list.get(index).key.equals(key)) {
+        while(count != capacity && bucket.get(index) != null && !bucket.get(index).key.equals(key)) {
             index = (index + 1) % capacity;
             count++;
         }
         int result = -1;
-        if(count != capacity && list.get(index) != null) {
-            result = list.get(index).value;
+        if(count != capacity && bucket.get(index) != null) {
+            result = bucket.get(index).value;
         }
         return new int[]{result, count};
     }
@@ -58,13 +58,13 @@ public class LinearProbing implements IHashingAlgorithm {
     public int delete(Integer key) {
         int index = hash(key);
         int count = 0;
-        while(count != capacity && list.get(index) != null && (list.get(index).key == null || !list.get(index).key.equals(key))) {
+        while(count != capacity && bucket.get(index) != null && (bucket.get(index).key == null || !bucket.get(index).key.equals(key))) {
             index = (index + 1) % capacity;
             count++;
         }
 
-        if(count != capacity && list.get(index) != null) {
-            list.get(index).key = null;
+        if(count != capacity && bucket.get(index) != null) {
+            bucket.get(index).key = null;
             size--;
             count++;
         }
