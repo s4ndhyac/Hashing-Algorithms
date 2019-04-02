@@ -8,16 +8,17 @@ All hashing algorithms implement the IHashingAlgorithm interface which include 4
 The Entry class defines the structure of the object that is used for operations on the hashtable. It has two data members – an Integer key and an Integer value.
 
 ## Build instructions:
+- cd into the folder src/hashingAlgorithms
 - Compile the files using the command: `javac *.java`
 - To test the hashing algorithms use the following commands:
 
-  `java hashingAlgorithms.Main dataPoints intervalSize numTrials hashingAlgorithm`
+  `java Main dataPoints intervalSize numTrials hashingAlgorithm`
 
 For example: 
 
-`java hashingAlgorithms.Main 100 1000 100 1 `
+`java Main 100 1000 100 1`
 
-`java hashingAlgorithms.Main 10 10 100 2`
+`java Main 10 10 100 2`
 
 where,
 
