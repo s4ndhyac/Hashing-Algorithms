@@ -1,5 +1,3 @@
-package hashingalgorithms;
-
 import java.util.ArrayList;
 
 public class LinearProbing implements IHashingAlgorithm {

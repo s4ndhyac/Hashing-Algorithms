@@ -1,4 +1,3 @@
-package hashingalgorithms;
 
 public class CuckooHashing implements IHashingAlgorithm {
 
